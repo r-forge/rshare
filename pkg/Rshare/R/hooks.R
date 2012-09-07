@@ -30,7 +30,9 @@ registerRshareHook <- function(objType, hookFunction, port=7777) {
 	if (identical(status,"closed")) stop(paste("Rshare must be running on port",port,"in order to register a hook"))
 	if (identical(status,"client")) {
 		# send hook object to server and run it there, much like asssign.Rshare
-		res <- "client"
+		req <- RshareAddHookReq(objType=objType, hookFunction=hookFunction, port=port)
+		sock <- getClientSocketId(port)
+		res <- sendRObj(req, sock, block=TRUE)
 	} else { # server
 		hooks <- get.Rshare(".hooks",port=port)
 		if (is.null(hooks)) hooks <- list()

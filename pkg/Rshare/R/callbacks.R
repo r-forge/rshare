@@ -165,6 +165,9 @@ createRshareTclCallbacks <- function() {
 		} else if (inherits(obj,"RshareLsfStrReq")) {
 			# List request
 			res <- do.call("lsf.str.Rshare",obj)
+		} else if (inherits(obj,"RshareAddHookReq")) {
+			# Add hook request
+			res <- do.call("registerRshareHook",obj)
 		}
 		if (doResponse) sendRObj(res,sock)
 		
@@ -184,7 +187,7 @@ createRshareTclCallbacks <- function() {
 			}
 			
 		} else {	
-			# unrecognized object, throw warning? 
+			# unrecognized object, throw warning or just give warning message? 
 			## TODO: make warning an option
 			assign.Rshare(".latestObj",obj,port=port)
 			cat("Warning: unrecognized request object type \n")

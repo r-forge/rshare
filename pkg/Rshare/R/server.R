@@ -62,14 +62,19 @@ startRshare <- function (port = 7777) {
 #' @export
 stopRshare <- function (port = 7777) {
 	status <- getStatus(port)
-	if (identical(status,"server")) {
-		.Tcl(paste("close $Rshare_",port,"(server)",sep=""))
-		message(paste("Rshare server on port",port,"stopped at",format(Sys.time(),"%H:%M:%S")))
-	} else if (identical(status,"client")) {
-		.Tcl(paste("close $Rshare_",port,"(client)",sep=""))
-		message(paste("Rshare client on port",port,"stopped at",format(Sys.time(),"%H:%M:%S")))
-	} 
+	
+	if (!identical(status,"closed")) {
+		.Tcl(paste("close $Rshare_",port,"("status,")",sep=""))
+		message(paste("Rshare",status,"on port",port,"stopped at",format(Sys.time(),"%H:%M:%S")))
+	}
+	
 	setStatus(port,"closed")
+}
+
+#' @export
+getClientSocketId <- function(port) {
+	if (!identical(getStatus(port),"client")) return(NULL)
+	as.character(.Tcl(paste("set Rshare_",port,"(client)",sep="")))
 }
 
 #' @export

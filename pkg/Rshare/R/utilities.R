@@ -68,7 +68,7 @@ getPortEnv <- function(port) {
 assign.Rshare <- function(x, value, port = 7777, inherits=FALSE) {
 	status <- getStatus(port)
 	if (identical(status,"client")) {
-		sock <- as.character(.Tcl(paste("set Rshare_",port,"(client)",sep="")))
+		sock <- getClientSocketId(port)
 		req <- RshareAssignReq(x,value,inherits=inherits)
 		res <- sendRObj(req,sock) # do not block for response
 		return(invisible(value))
@@ -83,7 +83,7 @@ get.Rshare <- function(x, port = 7777, timeout = 10L, mode = "any", inherits = F
 	status <- getStatus(port)
 	
 	if (identical(status,"client")) {
-		sock <- as.character(.Tcl(paste("set Rshare_",port,"(client)",sep="")))
+		sock <- getClientSocketId(port)
 		req <- RshareGetReq(x, mode=mode, inherits=inherits)
 		res <- sendRObj(req,sock,block=TRUE,timeout=timeout)
 		return(res)
@@ -99,7 +99,7 @@ get.Rshare <- function(x, port = 7777, timeout = 10L, mode = "any", inherits = F
 remove.Rshare <- function(..., list = character(), port = 7777) {
 	status <- getStatus(port)
 	if (identical(status,"client")) {
-		sock <- as.character(.Tcl(paste("set Rshare_",port,"(client)",sep="")))
+		sock <- getClientSocketId(port)
 		req <- RshareRemoveReq(..., list = list)
 		res <- sendRObj(req,sock,block=TRUE)
 		invisible(res)
@@ -116,7 +116,7 @@ rm.Rshare <- remove.Rshare
 exists.Rshare <- function(x, port = 7777, mode = "any", inherits=FALSE) {
 	status <- getStatus(port)
 	if (identical(status,"client")) {
-		sock <- as.character(.Tcl(paste("set Rshare_",port,"(client)",sep="")))
+		sock <- getClientSocketId(port)
 		req <- RshareExistsReq(x=x, mode=mode, inherits=inherits)
 		res <- sendRObj(req,sock,block=TRUE)
 		return(res)
@@ -130,7 +130,7 @@ exists.Rshare <- function(x, port = 7777, mode = "any", inherits=FALSE) {
 ls.Rshare <- function(port = 7777, all.names = FALSE, ...) {
 	status <- getStatus(port)
 	if (identical(status,"client")) {
-		sock <- as.character(.Tcl(paste("set Rshare_",port,"(client)",sep="")))
+		sock <- getClientSocketId(port)
 		req <- RshareLsReq(all.names = all.names, ...)
 		res <- sendRObj(req,sock,block=TRUE)
 		return(res)
@@ -144,7 +144,7 @@ ls.Rshare <- function(port = 7777, all.names = FALSE, ...) {
 ls.str.Rshare <- function(port = 7777, all.names = FALSE, ...) {
 	status <- getStatus(port)
 	if (identical(status,"client")) {
-		sock <- as.character(.Tcl(paste("set Rshare_",port,"(client)",sep="")))
+		sock <- getClientSocketId(port)
 		req <- RshareLsStrReq(all.names = all.names, ...)
 		res <- sendRObj(req,sock,block=TRUE)
 		return(res)
@@ -158,7 +158,7 @@ ls.str.Rshare <- function(port = 7777, all.names = FALSE, ...) {
 lsf.str.Rshare <- function(port = 7777, all.names = FALSE, ...) {
 	status <- getStatus(port)
 	if (identical(status,"client")) {
-		sock <- as.character(.Tcl(paste("set Rshare_",port,"(client)",sep="")))
+		sock <- getClientSocketId(port)
 		req <- RshareLsfStrReq(all.names = all.names, ...)
 		res <- sendRObj(req,sock,block=TRUE)
 		return(res)

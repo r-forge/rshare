@@ -23,6 +23,7 @@
 }
 
 .Last.lib <- function(libpath) {
+	stopRshare()
 	# close out socket connection if needed
 	# if (exists.Rshare("con")) {
 		# con <- get.Rshare("con")

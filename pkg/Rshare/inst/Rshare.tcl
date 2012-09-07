@@ -62,6 +62,8 @@ proc sockClientProcess {port sock buf {left 0}} {
 	#global sockTerminator
 	global Rshare_[set port]
 	
+	if {$sock == ""} {return}
+	
 	if {$left == 0} {
 		# new read
 		# set left value to object length 
@@ -87,22 +89,6 @@ proc sockClientProcess {port sock buf {left 0}} {
 		set left 0
 		return $buf
 	}
-	
-	# set in [read $sock]
-	# set inlen [string length $in]
-	# if {$inlen == 0} {
-		# fileevent $sock readable ""
-		# return $buf
-	# }
-	
-	# set donestart [string first $::sockTerminator $in]
-	# if {$donestart != -1} { 
-		# append buf [string range $in 0 [expr $donestart - 1]]
-		# return $buf
-	# } else {
-		# append buf $in
-		# return [sockClientProcess $port $sock $buf]
-	# }
 }
 
 proc sockServerProcessDone {port sock args} {
@@ -159,19 +145,6 @@ proc sockServerProcess {port sock buf {left 0}} {
 		set Rshare_[set port]($sock,data_ready) 1
 	}
 	fileevent $sock readable [list sockServerProcess $port $sock $buf $left]
-	
-	# set in [read $sock]
-	# set inlen [string length $in]
-	# set donestart [string first $::sockTerminator $in]
-	# if {$donestart != -1} { 
-		# append buf [string range $in 0 [expr $donestart - 1]]
-		# set Rshare_[set port]($sock,data) $buf
-		# set buf [string range $in [expr $donestart + [string length $::sockTerminator]] $inlen]
-		# set Rshare_[set port]($sock,data_ready) 1
-	# } else {
-		# append buf $in
-	# }
-	# fileevent $sock readable [list sockServerProcess $port $sock $buf]
 }
 
 proc sockConnected {sock addr sockport} {

@@ -1,0 +1,20 @@
+Package: Rshare
+Maintainer: Charlie Friedemann
+    <cfriedem@gmail.com>
+License: GPL-3
+Title: Shared environment across multiple independent R sessions
+Type: Package
+LazyLoad: yes
+Author: Charlie Friedemann
+Description: Share R objects across R multiple R sessions
+Version: 1.0
+Date: 2012-06-01
+Depends:
+    tcltk
+Collate:
+    'utilities.R'
+    'zzz.R'
+    'server.R'
+    'reqs.R'
+    'callbacks.R'
+    'hooks.R'

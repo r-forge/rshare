@@ -65,4 +65,11 @@ RshareLsfStrReq <- function(all.names = FALSE, ...) {
 }
 
 #' @export
+RshareAddHookReq <- function(objType, hookFunction, port) {
+	req <- structure(list(objType=objType, hookFunction=hookFunction, port=port))
+	class(req) <- c("RshareAddHookReq","RshareReq")
+	req
+}
+
+#' @export
 # .RshareTerminator <- function() { serialize(Inf,NULL) }

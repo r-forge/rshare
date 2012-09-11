@@ -16,12 +16,9 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 proc sockSend {sock data} {
-	#global sockTerminator
 	if {$sock == -1} {return}
 	if {[string length $data] == 0} {return}
-	#puts -nonewline $sock $datalen
 	puts -nonewline $sock $data
-	#puts -nonewline $sock $::sockTerminator
 	flush $sock
 }
 
@@ -59,7 +56,6 @@ proc sockClientReady {port sock} {
 }
 
 proc sockClientProcess {port sock buf {left 0}} {
-	#global sockTerminator
 	global Rshare_[set port]
 	
 	if {$sock == ""} {return}
@@ -104,7 +100,6 @@ proc sockServerProcessDone {port sock args} {
 }
 
 proc sockServerProcess {port sock buf {left 0}} {
-	#global sockTerminator
 	global Rshare_[set port]
 	
 	if {$sock == ""} {return}

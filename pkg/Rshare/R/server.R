@@ -15,12 +15,13 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#' Connect to Rshare
+#' Start / connect to Rshare
 #'
 #' This function starts the Rshare process in the current R session. If it is the first local R session to start Rshare on the specified port,
 #' then this R session will take the role of the server on that port. Otherwise, it will be a client.
 #'
-#' @param port
+#' @param port the Rshare port number
+#' @author Charlie Friedemann
 #' @export
 startRshare <- function (port = 7777) {
 	port <- try(as.integer(port),silent=TRUE)
@@ -31,14 +32,8 @@ startRshare <- function (port = 7777) {
 	# Create port-specific environment, set enclosing environment to .Rshare
 	if (is.null(.Rshare[[getPortEnv(port)]])) assign(getPortEnv(port),new.env(parent=.Rshare),env=.Rshare)
 	
-	# Create tcl terminator
-	# .Tcl("global sockTerminator")
-	# tmp <- tclVar()
-	# tclvalue(tmp) <- as.integer(.RshareTerminator())
-	# .Tcl(paste("set ::sockTerminator [binary format c* $",as.character(tmp),"]",sep=""))
-	
 	# When R 2.15.2 comes out, will have patch that makes the following work instead, currenly patch is in R-devel
-	# tclvalue(tmp) <- serialize(obj,NULL)
+	# tclvalue(tmp) <- serialize(obj,NULL, xdr=FALSE)
 	
 	## TODO: allow user to set tcl channel buffer size as option
 	
@@ -64,20 +59,18 @@ stopRshare <- function (port = 7777) {
 	status <- getStatus(port)
 	
 	if (!identical(status,"closed")) {
-		.Tcl(paste("close $Rshare_",port,"("status,")",sep=""))
+		.Tcl(paste("close $Rshare_",port,"(",status,")",sep=""))
 		message(paste("Rshare",status,"on port",port,"stopped at",format(Sys.time(),"%H:%M:%S")))
 	}
 	
 	setStatus(port,"closed")
 }
 
-#' @export
 getClientSocketId <- function(port) {
 	if (!identical(getStatus(port),"client")) return(NULL)
 	as.character(.Tcl(paste("set Rshare_",port,"(client)",sep="")))
 }
 
-#' @export
 getSocketIds <- function(port = 7777) {
 	get.Rshare(".clientSockets",port=port)
 }
@@ -105,6 +98,14 @@ setStatus <- function(port, status) {
 	assign(".status", status, envir=.Rshare[[getPortEnv(port)]])
 }
 
+#' Get Rshare status on a particular port
+#'
+#' This function provides the user with the Rshare status on a certain port in the currently running R process. 
+#' It is useful for determining whether the Rshare process is running on a particular port as well as whether it is a server or client.
+#'
+#' @param port the Rshare port number
+#' @return one of \code{"server"}, \code{"client"} or \code{"closed"} indicating Rshare status
+#' @author Charlie Friedemann
 #' @export
 getStatus <- function(port) {
 	status <- try(get(".status", envir=.Rshare[[getPortEnv(port)]]), silent=TRUE) 
@@ -112,13 +113,39 @@ getStatus <- function(port) {
 	status
 }
 
+#' Send an R object to Rshare server
+#'
+#' This function is to be used by Rshare clients to send an object to the server. The user has the option to block for a response with a corresponding timeout.
+#'
+#' @param obj the R object to be sent. May be of any type.
+#' @param port the Rshare port number
+#' @param block logical; whether to block for a response
+#' @param timeout number of seconds to wait for a response if \code{block = TRUE}
+#' @return invisibly returns \code{TRUE} for successful non-blocking sends, otherwise returns the response received for blocking sends
+#' @seealso \code{\link{sendRObj}}
+#' @author Charlie Friedemann
+#' @export
+sendRshare <- function(obj, port, block=FALSE, timeout = 10L) {
+	status <- getStatus(port)
+	
+	if (!identical(status,"client")) stop("sendRshare may only be called by clients")
+	
+	sock <- getClientSocketId(port)
+	sendRObj(obj, sock, block=block, timeout=timeout)
+}
+
 #' Send an R object through a tcl socket connection
+#'
+#' This is a slightly lower-level method than \link{sendRshare} to send data through a tcl socket. 
+#' It requires the user to know the name of the tcl channel through which the data is to be sent. 
 #'
 #' @param obj the R object to be sent. May be of any type.
 #' @param sock a chacter vector containing the tcl socket identifier
-#' @param block logial; whether to block for a reponse
-#' @param timeout number of seconds to wait for a response if \code{block} is \code{TRUE}
-#' @return invisibly returns \code{TRUE} for non-blocking sends, otherwise returns the response received for blocking sends
+#' @param block logical; whether to block for a response
+#' @param timeout number of seconds to wait for a response if \code{block = TRUE}
+#' @return invisibly returns \code{TRUE} for successful non-blocking sends, otherwise returns the response received for blocking sends
+#' @seealso \code{\link{sendRshare}}
+#' @author Charlie Friedemann
 #' @export
 sendRObj <- function(obj, sock, block = FALSE, timeout = 10L) {
 	sobj <- serialize(obj,NULL,xdr=FALSE)

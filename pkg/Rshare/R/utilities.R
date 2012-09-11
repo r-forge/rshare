@@ -15,55 +15,37 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#' Fetch a local Rshare environment, creating it if necessary
-#'
-#' This function returns the specific local Rshare environment corresponding to the port number provided. If \code{port} is \code{NULL}, then
-#' the main local Rshare environment is returned. All the local port-specific Rshare environments are enclosed by the main Rshare environment. 
-#'
-#' When this function is called, it first checks the search path for the ".Rshare" environment. If it cannot be found, it is created and added to 
-#' the search path. If \code{port} was provided, it will then try to find the port-specific Rshare environment enclosed by the main ".Rshare" environment. 
-#' If this port-specific environment is not found, it will be created before it is returned.
-#'
-#' @param port the Rshare port number (\code{NULL})
-#' @return the requested Rshare environment
-#' @export
-# RshareEnv <- function(port = NULL) {
-	# pos <- match(".Rshare", search())
-	# if (is.na(pos)) {
-		# attach(list(), pos = length(search()) - 1,name=".Rshare")
-		# pos <- match(".Rshare", search())
-	# }
-	# if (is.null(port)) {
-		# return(pos.to.env(pos))
-	# } else {
-		# port <- try(as.integer(port),silent=TRUE)
-		# if (inherits(port,"try-error") || port <= 0) stop("port must be a positive integer!")
-		
-		# if (exists("environments",where=pos)) {
-			# environments <- get("environments",pos=pos,inherits=FALSE)
-		# } else environments <- list()
-		# elem <- paste("port",port,sep="_")
-		# env <- environments[[elem]]
-		# if (is.null(env)) {
-			# env <- new.env(hash=TRUE,parent=pos.to.env(pos))
-			# environments[[elem]] <- env
-			# assign("environments",environments,pos=pos)
-		# }
-		# return(env)
-	# }
-# }
-
-#' @export
-getPortEnv <- function(port) {
-	paste("Rshare",port,sep="_")
-}
-
 #' Accessing the Rshare shared environment 
 #'
-#' Access to the Rshare environment is parameterized by a specific port number. Otherwise, the usual R functions such as \code{assign},
-#' \code{get},
+#' Access to the Rshare environment is parameterized by the port number on which the Rshare server is run. 
+#' If Rshare has not beeninitialized in the current R session, these functions will just access the local Rshare environment. 
+#' Other than the lack of any \code{envir} argument and the addition of a \code{port} argument, these functions are analogous to their standard counterparts.
+#' 
+#' @param port the Rshare port number
+#' @param timeout number of seconds to wait for a response from the Rshare server
 #'
-#' @rdname assign.Rshare
+#' @seealso \code{\link{get}}, \code{\link{assign}}, \code{\link{remove}}, \code{\link{exists}}, \code{\link{ls}}, \code{\link{ls.str}}, \code{\link{lsf.str}}
+#' @author Charlie Friedemann
+#' @inheritParams base::get
+#' @rdname get.Rshare
+#' @export
+get.Rshare <- function(x, port = 7777, timeout = 10L, mode = "any", inherits = FALSE) {
+	status <- getStatus(port)
+	
+	if (identical(status,"client")) {
+		sock <- getClientSocketId(port)
+		req <- RshareGetReq(x, mode=mode, inherits=inherits)
+		res <- sendRObj(req,sock,block=TRUE,timeout=timeout)
+		return(res)
+	} else { # server
+		if (exists(x, envir = .Rshare[[getPortEnv(port)]], mode=mode, inherits = inherits)) {
+			return(get(x, envir = .Rshare[[getPortEnv(port)]], mode=mode, inherits = inherits))
+		} else return(NULL)
+	} 
+}
+
+#' @inheritParams base::assign
+#' @rdname get.Rshare
 #' @export
 assign.Rshare <- function(x, value, port = 7777, inherits=FALSE) {
 	status <- getStatus(port)
@@ -77,24 +59,9 @@ assign.Rshare <- function(x, value, port = 7777, inherits=FALSE) {
 	}
 }
 
-#' @rdname assign.Rshare
-#' @export
-get.Rshare <- function(x, port = 7777, timeout = 10L, mode = "any", inherits = FALSE) {
-	status <- getStatus(port)
-	
-	if (identical(status,"client")) {
-		sock <- getClientSocketId(port)
-		req <- RshareGetReq(x, mode=mode, inherits=inherits)
-		res <- sendRObj(req,sock,block=TRUE,timeout=timeout)
-		return(res)
-	} else { # client
-		if (exists(x, envir = .Rshare[[getPortEnv(port)]], mode=mode, inherits = inherits)) {
-			return(get(x, envir = .Rshare[[getPortEnv(port)]], mode=mode, inherits = inherits))
-		} else return(NULL)
-	} 
-}
-
-#' @rdname assign.Rshare
+#' @inheritParams base::remove
+#' @aliases rm.Rshare
+#' @rdname get.Rshare
 #' @export
 remove.Rshare <- function(..., list = character(), port = 7777) {
 	status <- getStatus(port)
@@ -111,7 +78,8 @@ remove.Rshare <- function(..., list = character(), port = 7777) {
 #' @export
 rm.Rshare <- remove.Rshare
 
-#' @rdname assign.Rshare
+#' @inheritParams base::exists
+#' @rdname get.Rshare
 #' @export
 exists.Rshare <- function(x, port = 7777, mode = "any", inherits=FALSE) {
 	status <- getStatus(port)
@@ -125,7 +93,8 @@ exists.Rshare <- function(x, port = 7777, mode = "any", inherits=FALSE) {
 	}
 }
 
-#' @rdname assign.Rshare
+#' @inheritParams base::ls
+#' @rdname get.Rshare
 #' @export
 ls.Rshare <- function(port = 7777, all.names = FALSE, ...) {
 	status <- getStatus(port)
@@ -139,7 +108,8 @@ ls.Rshare <- function(port = 7777, all.names = FALSE, ...) {
 	}
 }
 
-#' @rdname assign.Rshare
+#' @inheritParams utils::ls.str
+#' @rdname get.Rshare
 #' @export
 ls.str.Rshare <- function(port = 7777, all.names = FALSE, ...) {
 	status <- getStatus(port)
@@ -153,7 +123,8 @@ ls.str.Rshare <- function(port = 7777, all.names = FALSE, ...) {
 	}
 }
 
-#' @rdname assign.Rshare
+#' @inheritParams utils::lsf.str
+#' @rdname get.Rshare
 #' @export
 lsf.str.Rshare <- function(port = 7777, all.names = FALSE, ...) {
 	status <- getStatus(port)
@@ -165,4 +136,8 @@ lsf.str.Rshare <- function(port = 7777, all.names = FALSE, ...) {
 	} else {
 		lsf.str(.Rshare[[getPortEnv(port)]], all.names=all.names, ...)
 	}
+}
+
+getPortEnv <- function(port) {
+	paste("Rshare",port,sep="_")
 }

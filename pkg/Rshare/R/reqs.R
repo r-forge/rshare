@@ -15,61 +15,50 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#' @export
 RshareAssignReq <- function(x, value, inherits = FALSE) {
 	req <- structure(list(x=x, value=value, inherits=inherits))
 	class(req) <- c("RshareAssignReq","RshareReq")
 	req
 }
 
-#' @export
 RshareGetReq <- function(x, mode = "any", inherits = FALSE) {
 	req <- structure(list(x=x, mode=mode, inherits=inherits))
 	class(req) <- c("RshareGetReq","RshareReq")
 	req
 }
 
-#' @export
 RshareExistsReq <- function(x, mode="any", inherits=FALSE) {
 	req <- structure(list(x=x, mode=mode, inherits=inherits))
 	class(req) <- c("RshareExistsReq","RshareReq")
 	req
 }
 
-#' @export
 RshareRemoveReq <- function(..., list = character()) {
 	req <- structure(list(..., list = list))
 	class(req) <- c("RshareRemoveReq","RshareReq")
 	req
 }
 
-#' @export
 RshareLsReq <- function(all.names = FALSE, ...) {
 	req <- structure(list(all.names=all.names, ...))
 	class(req) <- c("RshareLsReq","RshareReq")
 	req
 }
 
-#' @export
 RshareLsStrReq <- function(all.names = FALSE, ...) {
 	req <- structure(list(all.names=all.names, ...))
 	class(req) <- c("RshareLsStrReq","RshareReq")
 	req
 }
 
-#' @export
 RshareLsfStrReq <- function(all.names = FALSE, ...) {
 	req <- structure(list(all.names=all.names, ...))
 	class(req) <- c("RshareLsfStrReq","RshareReq")
 	req
 }
 
-#' @export
 RshareAddHookReq <- function(objType, hookFunction, port) {
 	req <- structure(list(objType=objType, hookFunction=hookFunction, port=port))
 	class(req) <- c("RshareAddHookReq","RshareReq")
 	req
 }
-
-#' @export
-# .RshareTerminator <- function() { serialize(Inf,NULL) }

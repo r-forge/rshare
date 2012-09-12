@@ -183,7 +183,7 @@ createRshareTclCallbacks <- function() {
 			# object has hooks, execute them in first to last order
 			objHooks <- hooks[[objType]]
 			for (i in 1:length(objHooks)) {
-				if ("port" %in% formals(objHooks[[i]])) do.call(objHooks[[i]], list(obj=obj, port=port)) else do.call(objHooks[[i]], list(obj=obj))
+				if ("port" %in% names(formals(objHooks[[i]]))) do.call(objHooks[[i]], list(obj=obj, port=port)) else do.call(objHooks[[i]], list(obj=obj))
 			}
 			
 		} else {	

@@ -8,19 +8,25 @@
   \item{obj}{the R object to be sent. May be of any type.}
 
   \item{sock}{a chacter vector containing the tcl socket
-  identifier}
+  identifier.}
 
-  \item{block}{logial; whether to block for a reponse}
+  \item{block}{logical; whether to block for a response.}
 
   \item{timeout}{number of seconds to wait for a response
-  if \code{block} is \code{TRUE}}
+  if \code{block = TRUE}.}
 }
 \value{
-  invisibly returns \code{TRUE} for non-blocking sends,
-  otherwise returns the response received for blocking
-  sends
+  invisibly returns \code{TRUE} for successful non-blocking
+  sends, otherwise returns the response received for
+  blocking sends.
 }
 \description{
-  Send an R object through a tcl socket connection
+  This is a slightly lower-level method than
+  \link{sendRshare} to send data through a tcl socket. It
+  requires the user to know the name of the tcl channel
+  through which the data is to be sent.
+}
+\seealso{
+  \code{\link{sendRshare}}
 }
 

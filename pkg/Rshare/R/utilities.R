@@ -15,18 +15,34 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+## Some documentation borrowed from get, assign, etc.
 #' Accessing the Rshare shared environment 
 #'
 #' Access to the Rshare environment is parameterized by the port number on which the Rshare server is run. 
-#' If Rshare has not beeninitialized in the current R session, these functions will just access the local Rshare environment. 
-#' Other than the lack of any \code{envir} argument and the addition of a \code{port} argument, these functions are analogous to their standard counterparts.
+#' If Rshare has not been initialized in the current R session, these functions will just access the local Rshare environment. 
+#' Other than the lack of any \code{envir} argument and the addition of \code{port} and \code{timeout} arguments, these functions are analogous to their non-Rshare counterparts.
 #' 
-#' @param port the Rshare port number
-#' @param timeout number of seconds to wait for a response from the Rshare server
-#'
+#' @param port the Rshare port number.
+#' @param timeout number of seconds to wait for a response from the Rshare server.
+#' @param x a variable name (given as a character string).
+#' @param mode the mode or type of object sought: see \code{\link{get}}.
+#' @param inherits should the enclosing frames of the environment be searched?
+#' @param value a value to be assigned to x.
+#' @param ...  see \code{\link{remove}} or \code{\link{lsf.str}}.
+#' @param list a character vector naming objects to be removed.
+#' @param all.names a logical value. If TRUE, all object names are returned. If FALSE, names which begin with a . are omitted.
+#' 
 #' @seealso \code{\link{get}}, \code{\link{assign}}, \code{\link{remove}}, \code{\link{exists}}, \code{\link{ls}}, \code{\link{ls.str}}, \code{\link{lsf.str}}
-#' @author Charlie Friedemann
-#' @inheritParams base::get
+#' @examples \dontrun{ 
+#' # start Rshare server on port 7777 (the default)
+#' startRshare()
+#' 
+#' # in different R session, start Rshare client, and access shared environment
+#' startRshare()
+#' assign.Rshare("mt",mtcars)
+#' ls.Rshare()
+#' get.Rshare("mt")
+#' }
 #' @rdname get.Rshare
 #' @export
 get.Rshare <- function(x, port = 7777, timeout = 10L, mode = "any", inherits = FALSE) {
@@ -44,7 +60,6 @@ get.Rshare <- function(x, port = 7777, timeout = 10L, mode = "any", inherits = F
 	} 
 }
 
-#' @inheritParams base::assign
 #' @rdname get.Rshare
 #' @export
 assign.Rshare <- function(x, value, port = 7777, inherits=FALSE) {
@@ -59,7 +74,6 @@ assign.Rshare <- function(x, value, port = 7777, inherits=FALSE) {
 	}
 }
 
-#' @inheritParams base::remove
 #' @aliases rm.Rshare
 #' @rdname get.Rshare
 #' @export
@@ -78,7 +92,6 @@ remove.Rshare <- function(..., list = character(), port = 7777) {
 #' @export
 rm.Rshare <- remove.Rshare
 
-#' @inheritParams base::exists
 #' @rdname get.Rshare
 #' @export
 exists.Rshare <- function(x, port = 7777, mode = "any", inherits=FALSE) {
@@ -93,7 +106,6 @@ exists.Rshare <- function(x, port = 7777, mode = "any", inherits=FALSE) {
 	}
 }
 
-#' @inheritParams base::ls
 #' @rdname get.Rshare
 #' @export
 ls.Rshare <- function(port = 7777, all.names = FALSE, ...) {
@@ -108,7 +120,6 @@ ls.Rshare <- function(port = 7777, all.names = FALSE, ...) {
 	}
 }
 
-#' @inheritParams utils::ls.str
 #' @rdname get.Rshare
 #' @export
 ls.str.Rshare <- function(port = 7777, all.names = FALSE, ...) {
@@ -123,7 +134,6 @@ ls.str.Rshare <- function(port = 7777, all.names = FALSE, ...) {
 	}
 }
 
-#' @inheritParams utils::lsf.str
 #' @rdname get.Rshare
 #' @export
 lsf.str.Rshare <- function(port = 7777, all.names = FALSE, ...) {

@@ -120,6 +120,7 @@ proc sockServerProcess {port sock buf {left 0}} {
 		## TODO: deal with endianess here!
 		set objlen [read $sock 4]
 		binary scan $objlen i* left 
+		if {$left == ""} {set left 0}
 	}
 	
 	if {$left == 0} {

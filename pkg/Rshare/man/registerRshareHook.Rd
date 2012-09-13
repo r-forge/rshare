@@ -24,7 +24,7 @@
   variety of purposes allowing for flexible interprocess
   communication and control between R sessions. Hooks may
   be created from both Rshare server sessions and client
-  sessions.
+  sessions using this function.
 }
 \section{Details}{
   The hook function may have just two formal arguments:
@@ -39,16 +39,16 @@
 }
 \examples{
 \dontrun{
-# start Rshare server on port 7777 (the default) and register hook
+# Start Rshare server on port 7777 (the default) and register hook
 startRshare()
 registerRshareHook("printMsg", function(obj, port) cat("Rshare message on port",port,"-",obj$msg,"\\n"))
 
-# in different R session, start Rshare client, and create an object of type 'printMsg'
+# In a different R session, start Rshare client, and create an object of type 'printMsg'
 startRshare()
 obj <- list(msg="Hello World!")
 class(obj) <- "printMsg"
 
-# send that object to the Rshare server, and watch the server session console
+# Send that object to the Rshare server, and watch the server session console
 sendRshare(obj)
 }
 }

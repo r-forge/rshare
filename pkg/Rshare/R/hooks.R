@@ -19,7 +19,7 @@
 #'
 #' Hooks can be used to trigger certain actions when an object of a particular type is sent to the Rshare server. 
 #' These hooks are simple, and can be used for a wide variety of purposes allowing for flexible interprocess communication and control between R sessions.
-#' Hooks may be created from both Rshare server sessions and client sessions.
+#' Hooks may be created from both Rshare server sessions and client sessions using this function.
 #'
 #' @section Details: The hook function may have just two formal arguments: \code{obj} and optionally, \code{port}. 
 #' The object sent to the Rshare server will be passed to the \code{obj} argument and thus should contain all data (other than the Rshare port number) required for the hook function. 
@@ -31,16 +31,16 @@
 #' @param port the Rshare port number.
 #' @return invisibly returns the number of server hooks currently registered for objects of type \code{objType}, including the hook registered by calling this function.
 #' @examples \dontrun{ 
-#' # start Rshare server on port 7777 (the default) and register hook 
+#' # Start Rshare server on port 7777 (the default) and register hook
 #' startRshare()
-#' registerRshareHook("printMsg", function(obj, port) cat("Rshare message on port",port,"-",obj$msg,"\n"))
+#' registerRshareHook("printMsg", function(obj, port) cat("Rshare message on port",port,"-",obj$msg,"\n")) 
 #' 
-#' # in different R session, start Rshare client, and create an object of type 'printMsg'
+#' # In a different R session, start Rshare client, and create an object of type 'printMsg'
 #' startRshare()
 #' obj <- list(msg="Hello World!")
 #' class(obj) <- "printMsg"
 #'
-#' # send that object to the Rshare server, and watch the server session console
+#' # Send that object to the Rshare server, and watch the server session console
 #' sendRshare(obj)
 #' }
 #' @export

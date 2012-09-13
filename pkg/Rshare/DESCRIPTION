@@ -8,7 +8,7 @@ LazyLoad: yes
 Author: Charlie Friedemann
 Description: Share R objects across R multiple R sessions
 Version: 1.0
-Date: 2012-06-01
+Date: 2012-09-12
 Depends:
     tcltk
 Collate:

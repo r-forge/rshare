@@ -19,7 +19,7 @@
 #' Accessing the Rshare shared environment 
 #'
 #' Access to the Rshare environment is parameterized by the port number on which the Rshare server is run. 
-#' If Rshare has not been initialized in the current R session, these functions will just access the local Rshare environment. 
+#' If Rshare has not been initialized in the current \R session, these functions will just access the local Rshare environment. 
 #' Other than the lack of any \code{envir} argument and the addition of \code{port} and \code{timeout} arguments, these functions are analogous to their non-Rshare counterparts.
 #' 
 #' @param port the Rshare port number.

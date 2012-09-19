@@ -172,10 +172,15 @@ proc sockPort {sock {role server}} {
 	return $port
 }
 
-proc sockStart {port} {
+proc sockStart {port {serv 0}} {
 	global Rshare_[set port]
 	# Try to create server channel
 	if {[catch {set Rshare_[set port](server) [socket -server sockConnected $port]}] != 0} {
+		if {$serv != 0} {
+			set Rshare_[set port](status) closed
+			return
+		}
+		
 		# Server channel creation failed: try client
 		if {[catch {set Rshare_[set port](client) [socket [info hostname] $port]}] != 0} {
 			# Couldn't create client channel

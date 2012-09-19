@@ -22,7 +22,7 @@
   object of a particular type is sent to the Rshare server.
   These hooks are simple, and can be used for a wide
   variety of purposes allowing for flexible interprocess
-  communication and control between R sessions. Hooks may
+  communication and control between \R sessions. Hooks may
   be created from both Rshare server sessions and client
   sessions using this function.
 }

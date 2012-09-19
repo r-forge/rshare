@@ -17,8 +17,8 @@
 
 #' Rshare: the shared environment package
 #'
-#' This is the Rshare package. It is used to create a shared environment available to multiple R sessions. 
-#' The environment is hosted and served by one R session, and other R sessions may subscribe to this environment as clients.
+#' This is the Rshare package. It is used to create a shared environment available to multiple \R sessions. 
+#' The environment is hosted and served by one \R session, and other \R sessions may subscribe to this environment as clients.
 #' Environments are parameterized by a port number. Objects may be written to and read from the shared environment. 
 #' For an overview of the functions used to access the shared environment, see See \code{\link{get.Rshare}}\cr
 #' \subsection{Server-side Hooks}{
@@ -29,8 +29,8 @@
 #' }
 #'
 #' @section Implementation:
-#' The package works by utilizing Tcl sockets to create a lightweight framework for different R sessions to share data.
-#' It is written with a mixture of R and Tcl code to allow for portability across mutliple operating systems. 
+#' The package works by utilizing Tcl sockets to create a lightweight framework for different \R sessions to share data.
+#' It is written with a mixture of \R and Tcl code to allow for portability across mutliple operating systems. 
 #' Be warned, the package is far from complete and functionality may change in the future to address current limitations.
 #'
 #' @section Details:
@@ -49,7 +49,7 @@ NULL
 .onLoad <- function(libname, pkgname) {
 	# Initialize Rshare environment
 	if (!exists(".Rshare")) .Rshare <<- new.env()
-	packageStartupMessage("Loaded Rshare version 1.0: See ?Rshare for more information \n")
+	packageStartupMessage("Loaded Rshare version 1.0: See ?Rshare for more information")
 }
 
 .Last.lib <- function(libpath) {

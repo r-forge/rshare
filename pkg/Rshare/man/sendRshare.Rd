@@ -1,12 +1,12 @@
 \name{sendRshare}
 \alias{sendRshare}
-\title{Send an R object to Rshare server}
+\title{Send an \R object to Rshare server}
 \usage{
   sendRshare(obj, port = 7777, block = FALSE,
     timeout = 10L)
 }
 \arguments{
-  \item{obj}{the R object to be sent. May be of any type.}
+  \item{obj}{the \R object to be sent. May be of any type.}
 
   \item{port}{the Rshare port number.}
 

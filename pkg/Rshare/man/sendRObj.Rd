@@ -1,11 +1,11 @@
 \name{sendRObj}
 \alias{sendRObj}
-\title{Send an R object through a tcl socket connection}
+\title{Send an \R object through a tcl socket connection}
 \usage{
   sendRObj(obj, sock, block = FALSE, timeout = 10L)
 }
 \arguments{
-  \item{obj}{the R object to be sent. May be of any type.}
+  \item{obj}{the \R object to be sent. May be of any type.}
 
   \item{sock}{a chacter vector containing the tcl socket
   identifier.}

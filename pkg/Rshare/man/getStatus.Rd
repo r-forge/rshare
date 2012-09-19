@@ -13,7 +13,7 @@
 }
 \description{
   This function provides the user with the Rshare status on
-  a certain port in the currently running R process. It is
+  a certain port in the currently running \R process. It is
   useful for determining whether the Rshare process is
   running on a particular port as well as whether it is a
   server or client.

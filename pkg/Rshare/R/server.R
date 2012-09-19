@@ -17,15 +17,16 @@
 
 #' Start / connect to Rshare
 #'
-#' This function starts the Rshare process in the current R session. If it is the first local R session to start Rshare on the specified port,
-#' then this R session will take the role of the server on that port. Otherwise, it will be a client.
+#' This function starts the Rshare process in the current \R session. If it is the first local \R session to start Rshare on the specified port,
+#' then this \R session will take the role of the server on that port. Otherwise, it will be a client.
 #'
 #' @param port the Rshare port number.
-#' @author Charlie Friedemann
+#' @param server.only only start in server mode, throwing an error if unable. Default \code{FALSE}.
+#' @param verbose option to print startup / shutdown messages. Default \code{TRUE}.
 #' @export
-startRshare <- function (port = 7777) {
+startRshare <- function (port = 7777, server.only = FALSE, verbose = TRUE) {
 	port <- try(as.integer(port),silent=TRUE)
-	if (inherits(port,"try-error") || port <= 0) stop("port must be a positive integer!")
+	if (inherits(port,"try-error") || port <= 0 || length(port) == 0) stop("port must be a positive integer!")
 	
 	if (getStatus(port) != "closed") stop(paste("Rshare already running as a",getStatus(port),"on port",port,"in this R instance!"))
 	
@@ -45,25 +46,36 @@ startRshare <- function (port = 7777) {
 	tcl("source",tclsrc)
 	
 	# Start socket server or client
-	tcl("sockStart",port)
+	if (isTRUE(server.only)) serv <- 1L else serv <- 0L
+	tcl("sockStart",port, serv)
 
 	status <- as.character(.Tcl(paste("set Rshare_",port,"(status)",sep="")))
+	if (identical(status,"closed")) {
+		if (isTRUE(server.only)) stop(paste("unable to start Rshare server on port",port)) else stop(paste("unable to start Rshare port",port))
+	}
 	setStatus(port,status)
+	if (verbose) message(paste("Rshare",status,"started on port",port))
 	
 	return(invisible(TRUE))
 }
 
 #' @rdname startRshare
 #' @export
-stopRshare <- function (port = 7777) {
+stopRshare <- function (port = 7777, verbose = TRUE) {
 	status <- getStatus(port)
 	
-	if (!identical(status,"closed")) {
+	if (identical(status,"server")) {
 		.Tcl(paste("global Rshare_",port,sep=""))
-		.Tcl(paste("close $Rshare_",port,"(",status,")",sep=""))
-		message(paste("Rshare",status,"on port",port,"stopped at",format(Sys.time(),"%H:%M:%S")))
+		for (sock in names(getSocketIds(port))) {
+			.Tcl(paste("close",sock))
+		}
+		.Tcl(paste("close $Rshare_",port,"(server)",sep=""))
+		if (verbose) message(paste("Rshare server on port",port,"stopped at",format(Sys.time(),"%H:%M:%S")))
+	} else if (identical(status,"client")) {
+		.Tcl(paste("global Rshare_",port,sep=""))
+		.Tcl(paste("close $Rshare_",port,"(client)",sep=""))
+		if (verbose) message(paste("Rshare client on port",port,"stopped at",format(Sys.time(),"%H:%M:%S")))
 	}
-	
 	setStatus(port,"closed")
 }
 
@@ -101,7 +113,7 @@ setStatus <- function(port, status) {
 
 #' Get Rshare status on a particular port
 #'
-#' This function provides the user with the Rshare status on a certain port in the currently running R process. 
+#' This function provides the user with the Rshare status on a certain port in the currently running \R process. 
 #' It is useful for determining whether the Rshare process is running on a particular port as well as whether it is a server or client.
 #'
 #' @param port the Rshare port number.
@@ -113,11 +125,11 @@ getStatus <- function(port) {
 	status
 }
 
-#' Send an R object to Rshare server
+#' Send an \R object to Rshare server
 #'
 #' This function is to be used by Rshare clients to send an object to the server. The user has the option to block for a response with a corresponding timeout.
 #'
-#' @param obj the R object to be sent. May be of any type.
+#' @param obj the \R object to be sent. May be of any type.
 #' @param port the Rshare port number.
 #' @param block logical; whether to block for a response.
 #' @param timeout number of seconds to wait for a response if \code{block = TRUE}.
@@ -133,12 +145,12 @@ sendRshare <- function(obj, port = 7777, block = FALSE, timeout = 10L) {
 	sendRObj(obj, sock, block=block, timeout=timeout)
 }
 
-#' Send an R object through a tcl socket connection
+#' Send an \R object through a tcl socket connection
 #'
 #' This is a slightly lower-level method than \link{sendRshare} to send data through a tcl socket. 
 #' It requires the user to know the name of the tcl channel through which the data is to be sent. 
 #'
-#' @param obj the R object to be sent. May be of any type.
+#' @param obj the \R object to be sent. May be of any type.
 #' @param sock a chacter vector containing the tcl socket identifier.
 #' @param block logical; whether to block for a response.
 #' @param timeout number of seconds to wait for a response if \code{block = TRUE}.

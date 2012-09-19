@@ -18,7 +18,7 @@
 #' Register an Rshare Hook
 #'
 #' Hooks can be used to trigger certain actions when an object of a particular type is sent to the Rshare server. 
-#' These hooks are simple, and can be used for a wide variety of purposes allowing for flexible interprocess communication and control between R sessions.
+#' These hooks are simple, and can be used for a wide variety of purposes allowing for flexible interprocess communication and control between \R sessions.
 #' Hooks may be created from both Rshare server sessions and client sessions using this function.
 #'
 #' @section Details: The hook function may have just two formal arguments: \code{obj} and optionally, \code{port}. 
@@ -29,6 +29,8 @@
 #' @param objType name of the type/class of the objects which will trigger the hook.
 #' @param hookFunction the hook function. See details.
 #' @param port the Rshare port number.
+#' @param doResponse logical; whether server hook returns a response to client when executed. Default is \code{FALSE}.
+#' @param overwriteExisting logical; should existing \code{objType} hook be overwritten? Default is \code{FALSE}.
 #' @return invisibly returns the number of server hooks currently registered for objects of type \code{objType}, including the hook registered by calling this function.
 #' @examples \dontrun{ 
 #' # Start Rshare server on port 7777 (the default) and register hook
@@ -44,7 +46,7 @@
 #' sendRshare(obj)
 #' }
 #' @export
-registerRshareHook <- function(objType, hookFunction, port = 7777) {
+registerRshareHook <- function(objType, hookFunction, port = 7777, doResponse = FALSE, overwriteExisting = FALSE) {
 	if (!is.character(objType)) stop("objType must be of type 'character'")
 	if (!identical(length(objType),1L)) {
 		objType <- objType[1]
@@ -62,22 +64,23 @@ registerRshareHook <- function(objType, hookFunction, port = 7777) {
 	if (identical(status,"closed")) stop(paste("Rshare must be running on port",port,"in order to register a hook"))
 	if (identical(status,"client")) {
 		# send hook object to server and wait for response, much like assign.Rshare
-		req <- RshareAddHookReq(objType=objType, hookFunction=hookFunction, port=port)
+		req <- RshareAddHookReq(objType=objType, hookFunction=hookFunction, port=port, doResponse=doResponse, overwriteExisting=overwriteExisting)
 		sock <- getClientSocketId(port)
 		res <- sendRObj(req, sock, block=TRUE)
+		if (!isTRUE(res)) stop(paste("'",objType,"' hook already exists on server. Set overwriteExisting=TRUE to overwrite",sep=""))
 	} else { # server
 		hooks <- get.Rshare(".hooks",port=port)
 		if (is.null(hooks)) hooks <- list()
 		
-		objHooks <- hooks[[objType]]
-		if (is.null(objHooks)) objHooks <- list()
-		
-		# Hooks are executed in first to last order of objHooks list, FIFE(xecuted) 
-		objHooks[[length(objHooks)+1]] <- hookFunction
-		
-		hooks[[objType]] <- objHooks
-		assign.Rshare(".hooks",hooks,port=port)
-		res <- length(objHooks)
+		objHook <- hooks[[objType]]
+		if (!is.null(objHook) && !isTRUE(overwriteExisting)) { # hook exists already, don't overwrite
+			res <- FALSE
+		} else {
+			objHook <- list(hookFunction=hookFunction, doResponse=doResponse)
+			hooks[[objType]] <- objHook
+			assign.Rshare(".hooks",hooks,port=port)
+			res <- TRUE
+		}
 	}
 	invisible(res)
 }

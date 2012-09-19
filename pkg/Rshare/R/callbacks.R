@@ -179,15 +179,17 @@ createRshareTclCallbacks <- function() {
 		objType <- class(obj)
 		hooks <- get.Rshare(".hooks",port=port)
 		if (is.null(hooks)) hooks <- list()
-		if (!is.null(hooks[[objType]])) {
-			# object has hooks, execute them in first to last order
-			objHooks <- hooks[[objType]]
-			for (i in 1:length(objHooks)) {
-				if ("port" %in% names(formals(objHooks[[i]]))) do.call(objHooks[[i]], list(obj=obj, port=port)) else do.call(objHooks[[i]], list(obj=obj))
+		if (!is.null(hooks[[objType]])) { #object has hooks
+			hookFunction <- hooks[[objType]]$hookFunction
+			doResponse <- hooks[[objType]]$doResponse
+			if ("port" %in% names(formals(hookFunction))) {
+				res <- do.call(hookFunction, list(obj=obj, port=port)) 
+			} else {
+				res <- do.call(hookFunction, list(obj=obj))
 			}
-			
+			if (doResponse) sendRObj(res,sock)
 		} else {	
-			# unrecognized object, throw warning or just give warning message? 
+			# unrecognized request object, throw warning or just give warning message? 
 			## TODO: make warning an option
 			assign.Rshare(".latestObj",obj,port=port)
 			cat("Warning: unrecognized request object type \n")

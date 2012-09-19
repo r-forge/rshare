@@ -2,7 +2,8 @@
 \alias{registerRshareHook}
 \title{Register an Rshare Hook}
 \usage{
-  registerRshareHook(objType, hookFunction, port = 7777)
+  registerRshareHook(objType, hookFunction, port = 7777,
+    doResponse = FALSE, overwriteExisting = FALSE)
 }
 \arguments{
   \item{objType}{name of the type/class of the objects
@@ -11,6 +12,14 @@
   \item{hookFunction}{the hook function. See details.}
 
   \item{port}{the Rshare port number.}
+
+  \item{doResponse}{logical; whether server hook returns a
+  response to client when executed. Default is
+  \code{FALSE}.}
+
+  \item{overwriteExisting}{logical; should existing
+  \code{objType} hook be overwritten? Default is
+  \code{FALSE}.}
 }
 \value{
   invisibly returns the number of server hooks currently

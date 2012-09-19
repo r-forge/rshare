@@ -57,8 +57,8 @@ RshareLsfStrReq <- function(all.names = FALSE, ...) {
 	req
 }
 
-RshareAddHookReq <- function(objType, hookFunction, port) {
-	req <- structure(list(objType=objType, hookFunction=hookFunction, port=port))
+RshareAddHookReq <- function(objType, hookFunction, port, doResponse = FALSE, overwriteExisting = FALSE) {
+	req <- structure(list(objType=objType, hookFunction=hookFunction, port=port, doResponse=doResponse, overwriteExisting=overwriteExisting))
 	class(req) <- c("RshareAddHookReq","RshareReq")
 	req
 }

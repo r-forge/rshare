@@ -7,7 +7,7 @@
 \arguments{
   \item{obj}{the \R object to be sent. May be of any type.}
 
-  \item{sock}{a chacter vector containing the tcl socket
+  \item{sock}{a chacter vector containing the Tcl socket
   identifier.}
 
   \item{block}{logical; whether to block for a response.}
@@ -22,8 +22,8 @@
 }
 \description{
   This is a slightly lower-level method than
-  \link{sendRshare} to send data through a tcl socket. It
-  requires the user to know the name of the tcl channel
+  \link{sendRshare} to send data through a Tcl socket. It
+  requires the user to know the name of the Tcl channel
   through which the data is to be sent.
 }
 \seealso{

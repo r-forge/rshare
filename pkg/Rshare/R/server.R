@@ -147,11 +147,11 @@ sendRshare <- function(obj, port = 7777, block = FALSE, timeout = 10L) {
 
 #' Send an \R object through a tcl socket connection
 #'
-#' This is a slightly lower-level method than \link{sendRshare} to send data through a tcl socket. 
-#' It requires the user to know the name of the tcl channel through which the data is to be sent. 
+#' This is a slightly lower-level method than \link{sendRshare} to send data through a Tcl socket. 
+#' It requires the user to know the name of the Tcl channel through which the data is to be sent. 
 #'
 #' @param obj the \R object to be sent. May be of any type.
-#' @param sock a chacter vector containing the tcl socket identifier.
+#' @param sock a chacter vector containing the Tcl socket identifier.
 #' @param block logical; whether to block for a response.
 #' @param timeout number of seconds to wait for a response if \code{block = TRUE}.
 #' @return invisibly returns \code{TRUE} for successful non-blocking sends, otherwise returns the response received for blocking sends.

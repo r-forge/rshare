@@ -53,5 +53,8 @@ NULL
 }
 
 .Last.lib <- function(libpath) {
-	stopRshare()
+	envs <- ls(.Rshare)
+	for (env in envs) {
+		if (!identical(.Rshare[[env]]$.status,"closed")) stopRshare(as.integer(unlist(strsplit(env,"_",fixed=TRUE))[2]))
+	}
 }

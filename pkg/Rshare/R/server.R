@@ -108,7 +108,7 @@ removeSocketId <- function(serverPort, channelId) {
 
 setStatus <- function(port, status) {
 	if (!status %in% c("server","client","closed")) stop("status may only be be 'server', 'client', or 'closed'")
-	assign(".status", status, envir=.Rshare[[getPortEnv(port)]])
+	if (!is.null(.Rshare[[getPortEnv(port)]])) assign(".status", status, envir=.Rshare[[getPortEnv(port)]])
 }
 
 #' Get Rshare status on a particular port

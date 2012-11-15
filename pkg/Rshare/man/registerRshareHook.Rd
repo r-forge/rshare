@@ -22,9 +22,8 @@
   \code{FALSE}.}
 }
 \value{
-  invisibly returns the number of server hooks currently
-  registered for objects of type \code{objType}, including
-  the hook registered by calling this function.
+  invisibly returns a logical indicating whether hook
+  registration was a success or not.
 }
 \description{
   Hooks can be used to trigger certain actions when an

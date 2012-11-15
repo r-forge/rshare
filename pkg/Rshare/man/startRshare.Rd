@@ -4,7 +4,7 @@
 \title{Start / connect to Rshare}
 \usage{
   startRshare(port = 7777, server.only = FALSE,
-    verbose = TRUE)
+    client.only = FALSE, verbose = TRUE)
 
   stopRshare(port = 7777, verbose = TRUE)
 }
@@ -13,6 +13,9 @@
 
   \item{server.only}{only start in server mode, throwing an
   error if unable. Default \code{FALSE}.}
+
+  \item{client.only}{like \code{server.only}, except to
+  force only client mode. Default \code{FALSE}.}
 
   \item{verbose}{option to print startup / shutdown
   messages. Default \code{TRUE}.}

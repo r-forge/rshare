@@ -31,7 +31,7 @@
 #' @param port the Rshare port number.
 #' @param doResponse logical; whether server hook returns a response to client when executed. Default is \code{FALSE}.
 #' @param overwriteExisting logical; should existing \code{objType} hook be overwritten? Default is \code{FALSE}.
-#' @return invisibly returns the number of server hooks currently registered for objects of type \code{objType}, including the hook registered by calling this function.
+#' @return invisibly returns a logical indicating whether hook registration was a success or not.
 #' @examples \dontrun{ 
 #' # Start Rshare server on port 7777 (the default) and register hook
 #' startRshare()

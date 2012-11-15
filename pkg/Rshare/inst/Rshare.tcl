@@ -172,34 +172,36 @@ proc sockPort {sock {role server}} {
 	return $port
 }
 
-proc sockStart {port {serv 0}} {
+proc sockStart {port {serv 0} {clio 0}} {
 	global Rshare_[set port]
-	# Try to create server channel
-	if {[catch {set Rshare_[set port](server) [socket -server sockConnected $port]}] != 0} {
+	
+	# Try to create server channel so long as not client-only
+	if {$clio == 0} { 
+		if {[catch {set Rshare_[set port](server) [socket -server sockConnected $port]}] == 0} {
+			# Configure server socket
+			fconfigure [set Rshare_[set port](server)] -encoding binary -blocking 0 -translation binary -buffering full -buffersize 819200
+			set Rshare_[set port](status) server
+			return
+		}
 		if {$serv != 0} {
 			set Rshare_[set port](status) closed
 			return
 		}
-		
-		# Server channel creation failed: try client
-		if {[catch {set Rshare_[set port](client) [socket [info hostname] $port]}] != 0} {
-			# Couldn't create client channel
-			Rcat "Error starting the Rshare client on port $port"
-			set Rshare_[set port](client) -1
-			set Rshare_[set port](status) closed
-			return
-		} else {
-			# Configure client socket
-			fconfigure [set Rshare_[set port](client)] -encoding binary -blocking 0 -translation binary -buffering full -buffersize 819200
-			trace add variable Rshare_[set port]([set Rshare_[set port](client)],data_ready) write [list sockServerProcessDone $port [set Rshare_[set port](client)]]
-			set Rshare_[set port](status) client
-			set Rshare_[set port]([set Rshare_[set port](client)],read_status) 0
-			return
-		}
+	}
+	
+	# Server channel creation failed: try client
+	if {[catch {set Rshare_[set port](client) [socket [info hostname] $port]}] != 0} {
+		# Couldn't create client channel
+		# Rcat "Error starting the Rshare client on port $port"
+		set Rshare_[set port](client) -1
+		set Rshare_[set port](status) closed
+		return
 	} else {
-		# Configure server socket
-		fconfigure [set Rshare_[set port](server)] -encoding binary -blocking 0 -translation binary -buffering full -buffersize 819200
-		set Rshare_[set port](status) server
+		# Configure client socket
+		fconfigure [set Rshare_[set port](client)] -encoding binary -blocking 0 -translation binary -buffering full -buffersize 819200
+		trace add variable Rshare_[set port]([set Rshare_[set port](client)],data_ready) write [list sockServerProcessDone $port [set Rshare_[set port](client)]]
+		set Rshare_[set port](status) client
+		set Rshare_[set port]([set Rshare_[set port](client)],read_status) 0
 		return
 	}
 }

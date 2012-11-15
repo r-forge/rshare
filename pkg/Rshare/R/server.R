@@ -22,9 +22,11 @@
 #'
 #' @param port the Rshare port number.
 #' @param server.only only start in server mode, throwing an error if unable. Default \code{FALSE}.
+#' @param client.only like \code{server.only}, except to force only client mode. Default \code{FALSE}.
 #' @param verbose option to print startup / shutdown messages. Default \code{TRUE}.
 #' @export
-startRshare <- function (port = 7777, server.only = FALSE, verbose = TRUE) {
+startRshare <- function (port = 7777, server.only = FALSE, client.only = FALSE, verbose = TRUE) {
+	if (server.only && client.only) stop("server.only and client.only cannot both be TRUE")
 	port <- try(as.integer(port),silent=TRUE)
 	if (inherits(port,"try-error") || port <= 0 || length(port) == 0) stop("port must be a positive integer!")
 	
@@ -47,11 +49,16 @@ startRshare <- function (port = 7777, server.only = FALSE, verbose = TRUE) {
 	
 	# Start socket server or client
 	if (isTRUE(server.only)) serv <- 1L else serv <- 0L
-	tcl("sockStart",port, serv)
+	if (isTRUE(client.only)) clio <- 1L else clio <- 0L
+	tcl("sockStart",port, serv, clio)
 
 	status <- as.character(.Tcl(paste("set Rshare_",port,"(status)",sep="")))
 	if (identical(status,"closed")) {
-		if (isTRUE(server.only)) stop(paste("unable to start Rshare server on port",port)) else stop(paste("unable to start Rshare port",port))
+		if (isTRUE(server.only)) {
+			stop(paste("unable to start Rshare server on port",port)) 
+		} else if (isTRUE(client.only)) {
+			stop(paste("unable to start Rshare client on port",port)) 
+		} else stop(paste("unable to start Rshare port",port))
 	}
 	setStatus(port,status)
 	if (verbose) message(paste("Rshare",status,"started on port",port))

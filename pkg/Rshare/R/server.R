@@ -35,9 +35,6 @@ startRshare <- function (port = 7777, server.only = FALSE, client.only = FALSE, 
 	# Create port-specific environment, set enclosing environment to .Rshare
 	if (is.null(.Rshare[[getPortEnv(port)]])) assign(getPortEnv(port),new.env(parent=.Rshare),envir=.Rshare)
 	
-	# When R 2.15.2 comes out, will have patch that makes the following work instead, currenly patch is in R-devel
-	# tclvalue(tmp) <- serialize(obj,NULL, xdr=FALSE)
-	
 	## TODO: allow user to set tcl channel buffer size as option
 	
 	# Create tcl callback procedures
@@ -170,11 +167,11 @@ sendRObj <- function(obj, sock, block = FALSE, timeout = 10L) {
 	dobj <- c(shead, sobj)
 	
 	tmp <- tclVar()
-	tclvalue(tmp) <- as.integer(dobj)
-	.Tcl(paste("set ",as.character(tmp)," [binary format c* $",as.character(tmp),"]",sep=""))
+	# tclvalue(tmp) <- as.integer(dobj)
+	#.Tcl(paste("set ",as.character(tmp)," [binary format c* $",as.character(tmp),"]",sep=""))
 	
-	# When R 2.15.2 comes out, will have patch that makes the following work instead, currenly patch is in R-devel
-	# tclvalue(tmp) <- serialize(obj,NULL)
+	# R 3.0 is out and has the as.tclObj patch for raw vectors. 
+	tclvalue(tmp) <- dobj
 	
 	if (block) {
 		timeout <- timeout * 1000

@@ -10,6 +10,7 @@ Description: Share R objects across R multiple R sessions
 Version: 1.0
 Date: 2012-09-12
 Depends:
+	R (>= 3.0),
     tcltk
 Collate:
     'utilities.R'
